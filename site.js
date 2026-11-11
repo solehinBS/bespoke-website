@@ -31,6 +31,14 @@ var MS = {
   "cta.whatsapp": "WhatsApp penasihat",
   "cta.agent": "Saya ejen hartanah",
 
+  "ch.title": "Bagaimana kami boleh bantu anda hari ini?",
+  "ch1.t": "Saya membeli atau membiaya semula",
+  "ch1.d": "Nasihat untuk pembeli dan pemilik hartanah",
+  "ch2.t": "Saya ejen hartanah",
+  "ch2.d": "Biar kami uruskan pembiayaan pembeli anda",
+  "ch3.t": "Saya ingin menyertai pasukan",
+  "ch3.d": "Jadi seorang Mortgage Specialist",
+
   "hero.eyebrow": "Khidmat nasihat pembiayaan rumah · Malaysia",
   "hero.title": "Bank yang tepat.<br>Pinjaman yang tepat.<br><span class=\"gold\">Sesuai untuk anda.</span>",
   "hero.lead": "Kami membantu pembeli dan pemilik hartanah di Malaysia memilih pembiayaan rumah yang tepat. Kami membandingkan pakej daripada pelbagai bank, menerangkan terma dalam bahasa yang mudah, dan membimbing anda dari permohonan hingga kelulusan, supaya anda meminjam dengan yakin.",
