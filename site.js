@@ -117,6 +117,8 @@ var MS = {
 
   "ct.title": "Mari cari yang paling sesuai untuk anda",
   "ct.lead": "Ceritakan sedikit tentang perancangan anda dan penasihat kami akan membalas melalui WhatsApp.",
+  "ct.office": "Pejabat",
+  "ct.email": "E-mel",
   "ct.agent": "Pertanyaan ejen hartanah",
   "ct.career": "Permohonan Mortgage Specialist",
 
