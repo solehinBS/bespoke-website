@@ -217,3 +217,24 @@ details p { padding: 0 40px 24px 0; color: var(--muted); }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* Small phones and zoomed-in phones: keep the header inside the screen */
+html { overflow-x: hidden; }
+body { overflow-x: clip; }
+.brand { min-width: 0; }
+.header-actions { flex-shrink: 0; }
+@media (max-width: 400px) {
+  .wrap { padding: 0 16px; }
+  .header-row { gap: 8px; height: 64px; }
+  .nav { top: 64px; }
+  .brand { gap: 8px; }
+  .brand img { width: 30px; height: 30px; }
+  .brand-text strong { font-size: 1.08rem; }
+  .brand-text em { font-size: .5rem; letter-spacing: .12em; }
+  .lang button { padding: 7px 9px; font-size: .72rem; }
+  .menu-btn { width: 38px; height: 38px; }
+  .choice { gap: 12px; padding: 14px; }
+  .choice-text strong { font-size: 1.05rem; }
+  .ico { width: 44px; height: 44px; border-radius: 12px; }
+  .card { grid-template-columns: 44px 1fr; column-gap: 12px; }
+}
