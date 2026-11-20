@@ -360,3 +360,10 @@ address { font-style: normal; }
   .gate-form .btn { flex: 1 1 100%; }
 }
 @media print { .gate, .gate-user { display: none !important; } }
+
+/* Calculator entry points */
+.share-note { margin-top: 14px; font-size: .9rem; opacity: .7; max-width: 46ch; }
+@media (min-width: 921px) {
+  .chooser-grid { grid-template-columns: repeat(2, 1fr); }
+  .choice { min-height: 84px; }
+}

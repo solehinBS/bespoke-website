@@ -89,6 +89,12 @@ var MS = {
   "gate.signedin": "Log masuk sebagai",
   "gate.signout": "Log keluar",
 
+  "cta.calc": "Kira ansuran saya",
+  "ch4.t": "Anggar ansuran saya",
+  "ch4.d": "Kalkulator pinjaman percuma dengan jadual penuh",
+  "ag.share": "Kongsi kalkulator dengan pembeli",
+  "ag.sharenote": "Hantar kalkulator pinjaman percuma kami kepada pembeli anda. Mereka terus nampak ansuran bulanan, dan kami uruskan susulan pembiayaan.",
+
   "hero.eyebrow": "Khidmat nasihat pembiayaan rumah · Malaysia",
   "hero.title": "Bank yang tepat.<br>Pinjaman yang tepat.<br><span class=\"gold\">Sesuai untuk anda.</span>",
   "hero.lead": "Kami membantu pembeli dan pemilik hartanah di Malaysia memilih pembiayaan rumah yang tepat. Kami membandingkan pakej daripada pelbagai bank, menerangkan terma dalam bahasa yang mudah, dan membimbing anda dari permohonan hingga kelulusan, supaya anda meminjam dengan yakin.",
@@ -527,4 +533,30 @@ var MS = {
   tag.onload = init;
   tag.onerror = function () { window.bmaSetLocked(false); };
   document.head.appendChild(tag);
+})();
+
+/* ============================================================
+   "Share calculator with buyers" (property agents)
+   Phones: the phone's share sheet. Computers: WhatsApp with the message ready.
+   ============================================================ */
+(function () {
+  var btn = document.getElementById("shareCalc");
+  if (!btn) return;
+  var URL_ = "https://www.bespokemortgageadvisory.my/#calculator";
+  var TEXT = {
+    en: "Check your monthly home loan instalment with Bespoke Mortgage Advisory's free loan calculator:",
+    ms: "Semak ansuran bulanan pinjaman rumah anda dengan kalkulator pinjaman percuma Bespoke Mortgage Advisory:"
+  };
+  function text() { return TEXT[document.documentElement.lang === "ms" ? "ms" : "en"]; }
+  function waHref() { return "https://wa.me/?text=" + encodeURIComponent(text() + " " + URL_); }
+  function sync() { btn.href = waHref(); btn.target = "_blank"; btn.rel = "noopener"; }
+  sync();
+  document.addEventListener("bma:lang", sync);
+  btn.addEventListener("click", function (e) {
+    var touch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.share) {
+      e.preventDefault();
+      navigator.share({ title: "Bespoke Mortgage Advisory", text: text(), url: URL_ }).catch(function () {});
+    }
+  });
 })();
