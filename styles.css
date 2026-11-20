@@ -350,7 +350,7 @@ address { font-style: normal; }
 .btn.is-busy, .btn:disabled { opacity: .6; cursor: progress; transform: none; }
 .gate-msg { color: #b3261e; font-size: .92rem; font-weight: 500; margin-top: 12px; min-height: 1em; }
 .gate-msg:empty { display: none; }
-.gate-legal { color: var(--muted); font-size: .8rem; margin-top: 16px; }
+.gate-legal { color: var(--muted); font-size: .7rem; line-height: 1.45; opacity: .85; margin-top: 14px; }
 .gate-user { margin-top: 14px; font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
 .gate-user strong { color: var(--navy); }
 .gate-user .btn-link { font-size: .9rem; }
