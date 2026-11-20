@@ -222,16 +222,16 @@
       <div class="gate" id="gate" hidden>
         <div class="gate-card">
           <h3 data-i18n="gate.title">See the full schedule</h3>
-          <p class="gate-lead" data-i18n="gate.lead">Enter your email to unlock the full amortisation table, Print / Save PDF and advisor follow-up. First time here? We'll email you a 6-digit code once. Registered? It opens straight away.</p>
+          <p class="gate-lead" data-i18n="gate.lead">Enter your email to unlock the full amortisation table, Print / Save PDF and advisor follow-up. First time here? We'll email you a one-time code. Registered? It opens straight away.</p>
           <form id="gateEmailForm" class="gate-form" novalidate>
             <label class="sr-only" for="gateEmail">Email</label>
             <input id="gateEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
             <button type="submit" class="btn btn-navy" id="gateSend" data-i18n="gate.send">Continue</button>
           </form>
           <form id="gateCodeForm" class="gate-form" novalidate hidden>
-            <p class="gate-sent"><span data-i18n="gate.sent">Welcome! To confirm your email, we sent a 6-digit code to</span> <strong id="gateSentTo"></strong></p>
+            <p class="gate-sent"><span data-i18n="gate.sent">Welcome! To confirm your email, we sent a code to</span> <strong id="gateSentTo"></strong></p>
             <label class="sr-only" for="gateCode">Code</label>
-            <input id="gateCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="••••••" required>
+            <input id="gateCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="••••••••" required>
             <button type="submit" class="btn btn-navy" id="gateVerify" data-i18n="gate.verify">Verify</button>
             <button type="button" class="btn-link" id="gateBack" data-i18n="gate.change">Use a different email</button>
           </form>

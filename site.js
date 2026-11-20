@@ -80,9 +80,9 @@ var MS = {
   "calc.note": "Kalkulator ini memberi anggaran sahaja, berdasarkan kadar tetap sepanjang tempoh. Ansuran sebenar bergantung pada pakej bank, perubahan kadar dan caj. Hubungi kami untuk angka berdasarkan keadaan anda.",
 
   "gate.title": "Lihat jadual penuh",
-  "gate.lead": "Masukkan e-mel anda untuk membuka jadual pelunasan penuh, Cetak / Simpan PDF dan susulan penasihat. Kali pertama? Kami akan e-melkan kod 6 digit sekali sahaja. Sudah berdaftar? Ia terus dibuka.",
+  "gate.lead": "Masukkan e-mel anda untuk membuka jadual pelunasan penuh, Cetak / Simpan PDF dan susulan penasihat. Kali pertama? Kami akan e-melkan kod sekali guna. Sudah berdaftar? Ia terus dibuka.",
   "gate.send": "Teruskan",
-  "gate.sent": "Selamat datang! Untuk mengesahkan e-mel anda, kami telah menghantar kod 6 digit ke",
+  "gate.sent": "Selamat datang! Untuk mengesahkan e-mel anda, kami telah menghantar kod ke",
   "gate.verify": "Sahkan",
   "gate.change": "Guna e-mel lain",
   "gate.legal": "Dengan meneruskan, anda bersetuju bahawa Bespoke Mortgage Advisory boleh menyimpan e-mel anda dan menghubungi anda tentang pembiayaan rumah. Kami tidak berkongsinya dengan pihak lain.",
