@@ -80,9 +80,9 @@ var MS = {
   "calc.note": "Kalkulator ini memberi anggaran sahaja, berdasarkan kadar tetap sepanjang tempoh. Ansuran sebenar bergantung pada pakej bank, perubahan kadar dan caj. Hubungi kami untuk angka berdasarkan keadaan anda.",
 
   "gate.title": "Lihat jadual penuh",
-  "gate.lead": "Masukkan e-mel anda untuk membuka jadual pelunasan penuh, Cetak / Simpan PDF dan susulan penasihat. Pengguna baharu atau sedia ada, langkahnya sama.",
-  "gate.send": "Hantar kod",
-  "gate.sent": "Kami telah menghantar kod ke",
+  "gate.lead": "Masukkan e-mel anda untuk membuka jadual pelunasan penuh, Cetak / Simpan PDF dan susulan penasihat. Kali pertama? Kami akan e-melkan kod 6 digit sekali sahaja. Sudah berdaftar? Ia terus dibuka.",
+  "gate.send": "Teruskan",
+  "gate.sent": "Selamat datang! Untuk mengesahkan e-mel anda, kami telah menghantar kod 6 digit ke",
   "gate.verify": "Sahkan",
   "gate.change": "Guna e-mel lain",
   "gate.legal": "Dengan meneruskan, anda bersetuju bahawa Bespoke Mortgage Advisory boleh menyimpan e-mel anda dan menghubungi anda tentang pembiayaan rumah. Kami tidak berkongsinya dengan pihak lain.",
@@ -428,8 +428,19 @@ var MS = {
     }
   };
 
+  var STORE_KEY = "bma-calc-email";
   var client = null, email = "", msgKey = "";
-  window.bmaSetLocked(true);
+  function remembered() { try { return localStorage.getItem(STORE_KEY) || ""; } catch (e) { return ""; } }
+  function remember(v) { try { if (v) localStorage.setItem(STORE_KEY, v); else localStorage.removeItem(STORE_KEY); } catch (e) {} }
+
+  // Signed in before on this device: open straight away, no network needed.
+  if (remembered()) {
+    $("gateUserEmail").textContent = remembered();
+    $("gateUser").hidden = false;
+    window.bmaSetLocked(false);
+  } else {
+    window.bmaSetLocked(true);
+  }
 
   function lang() { return document.documentElement.lang === "ms" ? "ms" : "en"; }
   function msg(key) { msgKey = key || ""; $("gateMsg").textContent = msgKey ? MSG[lang()][msgKey] : ""; }
@@ -450,12 +461,14 @@ var MS = {
     $("gateEmailForm").hidden = true; $("gateCodeForm").hidden = false;
     msg(""); $("gateCode").focus();
   }
-  function signedIn(user) {
-    $("gateUserEmail").textContent = user.email || "";
+  function signedIn(addr) {
+    remember(addr);
+    $("gateUserEmail").textContent = addr;
     $("gateUser").hidden = false;
     window.bmaSetLocked(false);
   }
   function signedOut() {
+    remember("");
     $("gateUser").hidden = true;
     window.bmaSetLocked(true);
     stepEmail();
@@ -467,9 +480,13 @@ var MS = {
     email = $("gateEmail").value.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg("email"); return; }
     busy($("gateSend"), true); msg("");
-    client.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } }).then(function (r) {
-      busy($("gateSend"), false);
-      if (r.error) msg(errKey(r.error)); else stepCode();
+    // Registered (verified before)? Open straight away. Otherwise email a one-time code.
+    client.rpc("calc_returning_signin", { p_email: email }).then(function (r) {
+      if (!r.error && r.data === true) { busy($("gateSend"), false); signedIn(email); return; }
+      client.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } }).then(function (r2) {
+        busy($("gateSend"), false);
+        if (r2.error) msg(errKey(r2.error)); else stepCode();
+      });
     });
   });
 
@@ -482,7 +499,7 @@ var MS = {
     client.auth.verifyOtp({ email: email, token: code, type: "email" }).then(function (r) {
       busy($("gateVerify"), false);
       if (r.error) { msg(errKey(r.error)); return; }
-      if (r.data && r.data.user) signedIn(r.data.user);
+      signedIn(email);
     });
   });
 
@@ -494,16 +511,9 @@ var MS = {
 
   function init() {
     if (!window.supabase || !window.supabase.createClient) { window.bmaSetLocked(false); return; }
+    // The browser keeps no Supabase login; "signed in" is the remembered email on this device.
     client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
-    });
-    client.auth.getSession().then(function (r) {
-      var u = r.data && r.data.session && r.data.session.user;
-      if (u) signedIn(u); else signedOut();
-    });
-    client.auth.onAuthStateChange(function (ev, session) {
-      if (session && session.user) signedIn(session.user);
-      else if (ev === "SIGNED_OUT") signedOut();
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
     });
   }
 
