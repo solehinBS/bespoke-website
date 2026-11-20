@@ -57,7 +57,7 @@ var MS = {
   "calc.months": "bulan",
   "calc.extra": "Bayaran tambahan sebulan",
   "calc.optional": "(pilihan)",
-  "calc.error": "Sila masukkan jumlah pinjaman, kadar faedah dan tempoh pinjaman.",
+  "calc.error": "Sila semak angka: kadar faedah sehingga 30% dan tempoh pinjaman sehingga 50 tahun.",
   "calc.reset": "Set semula",
   "calc.monthly": "Ansuran bulanan",
   "calc.withextra": "Dengan bayaran tambahan:",
@@ -238,7 +238,7 @@ var MS = {
   var $ = function (id) { return document.getElementById(id); };
   var form = $("calcForm");
   if (!form) return;
-  var DEFAULTS = { cAmount: "500,000", cRate: "3.9", cYears: "35", cMonths: "", cExtra: "" };
+  var FIELDS = ["cAmount", "cRate", "cYears", "cMonths", "cExtra"];
   var view = "month";
   var last = null;
   var locked = false;
@@ -286,9 +286,11 @@ var MS = {
     var P = num($("cAmount").value), rate = num($("cRate").value);
     var n = Math.round(num($("cYears").value) * 12 + num($("cMonths").value));
     var extra = num($("cExtra").value);
-    var ok = P > 0 && $("cRate").value.trim() !== "" && rate <= 30 && n > 0 && n <= 600;
-    $("calcError").hidden = ok;
-    if (!ok) { last = null; render(); return; }
+    // Out-of-range figures get a message; empty or unfinished fields just show "–".
+    var outOfRange = rate > 30 || n > 600;
+    var complete = P > 0 && $("cRate").value.trim() !== "" && n > 0;
+    $("calcError").hidden = !outOfRange;
+    if (outOfRange || !complete) { last = null; render(); return; }
     var base = schedule(P, rate, n, 0);
     var res = extra > 0 ? schedule(P, rate, n, extra) : base;
     last = { P: P, rate: rate, n: n, extra: extra, base: base, res: res };
@@ -359,8 +361,9 @@ var MS = {
   });
   form.addEventListener("submit", function (e) { e.preventDefault(); calc(); });
   $("calcReset").addEventListener("click", function () {
-    Object.keys(DEFAULTS).forEach(function (id) { $(id).value = DEFAULTS[id]; });
+    FIELDS.forEach(function (id) { $(id).value = ""; });
     calc();
+    $("cAmount").focus();
   });
   document.querySelectorAll(".seg button").forEach(function (b) {
     b.addEventListener("click", function () {

@@ -159,16 +159,16 @@
       <form class="calc-form" id="calcForm" novalidate>
         <label class="field">
           <span data-i18n="calc.amount">Loan amount</span>
-          <span class="input-wrap"><em>RM</em><input id="cAmount" type="text" inputmode="decimal" autocomplete="off" value="500,000"></span>
+          <span class="input-wrap"><em>RM</em><input id="cAmount" type="text" inputmode="decimal" autocomplete="off" value="500,000" placeholder="0"></span>
         </label>
         <label class="field">
           <span data-i18n="calc.rate">Interest rate</span>
-          <span class="input-wrap"><input id="cRate" type="text" inputmode="decimal" autocomplete="off" value="3.9"><em data-i18n="calc.peryear">% per year</em></span>
+          <span class="input-wrap"><input id="cRate" type="text" inputmode="decimal" autocomplete="off" value="3.9" placeholder="0"><em data-i18n="calc.peryear">% per year</em></span>
         </label>
         <div class="field">
           <span data-i18n="calc.term">Loan term</span>
           <div class="field-pair">
-            <label class="input-wrap"><input id="cYears" type="text" inputmode="numeric" autocomplete="off" value="35" aria-label="Years"><em data-i18n="calc.years">years</em></label>
+            <label class="input-wrap"><input id="cYears" type="text" inputmode="numeric" autocomplete="off" value="35" placeholder="0" aria-label="Years"><em data-i18n="calc.years">years</em></label>
             <label class="input-wrap"><input id="cMonths" type="text" inputmode="numeric" autocomplete="off" value="" placeholder="0" aria-label="Months"><em data-i18n="calc.months">months</em></label>
           </div>
         </div>
@@ -176,7 +176,7 @@
           <span><span data-i18n="calc.extra">Extra payment per month</span> <small data-i18n="calc.optional">(optional)</small></span>
           <span class="input-wrap"><em>RM</em><input id="cExtra" type="text" inputmode="decimal" autocomplete="off" value="" placeholder="0"></span>
         </label>
-        <p class="calc-error" id="calcError" role="alert" hidden data-i18n="calc.error">Please enter a loan amount, an interest rate and a loan term.</p>
+        <p class="calc-error" id="calcError" role="alert" hidden data-i18n="calc.error">Please check the figures: interest rate up to 30% and loan term up to 50 years.</p>
         <button type="button" class="btn-link" id="calcReset" data-i18n="calc.reset">Reset</button>
       </form>
 
