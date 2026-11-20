@@ -7,8 +7,8 @@ var WHATSAPP_NUMBER = "60102107256";
 // Email sign-in for the loan calculator's full schedule (Supabase project for the website).
 // Paste the Project URL and the anon / publishable key from Supabase > Project Settings > API.
 // While either is empty, the calculator stays fully open (no sign-in).
-var SUPABASE_URL = "";
-var SUPABASE_ANON_KEY = "";
+var SUPABASE_URL = "https://hwmbccnelkljrvaeajcx.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_cPLjL811Xvp4AgBLFnsyVQ_fB32ggTH";
 var SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
 
 // Pre-filled WhatsApp messages for each button type.
