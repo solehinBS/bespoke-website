@@ -27,6 +27,7 @@
     <nav class="nav" id="nav" aria-label="Main">
       <a href="#services" data-i18n="nav.services">Services</a>
       <a href="#process" data-i18n="nav.process">How it works</a>
+      <a href="#calculator" data-i18n="nav.calc">Loan Calculator</a>
       <a href="#agents" data-i18n="nav.agents">For Property Agents</a>
       <a href="#careers" data-i18n="nav.careers">Careers</a>
       <a href="#faq" data-i18n="nav.faq">FAQ</a>
@@ -149,6 +150,80 @@
   </div>
 </section>
 
+<!-- CALCULATOR -->
+<section class="section" id="calculator">
+  <div class="wrap">
+    <p class="eyebrow dark" data-i18n="calc.eyebrow">Loan calculator</p>
+    <h2 data-i18n="calc.title">Estimate your monthly instalment</h2>
+    <div class="calc">
+      <form class="calc-form" id="calcForm" novalidate>
+        <label class="field">
+          <span data-i18n="calc.amount">Loan amount</span>
+          <span class="input-wrap"><em>RM</em><input id="cAmount" type="text" inputmode="decimal" autocomplete="off" value="500,000"></span>
+        </label>
+        <label class="field">
+          <span data-i18n="calc.rate">Interest rate</span>
+          <span class="input-wrap"><input id="cRate" type="text" inputmode="decimal" autocomplete="off" value="3.9"><em data-i18n="calc.peryear">% per year</em></span>
+        </label>
+        <div class="field">
+          <span data-i18n="calc.term">Loan term</span>
+          <div class="field-pair">
+            <label class="input-wrap"><input id="cYears" type="text" inputmode="numeric" autocomplete="off" value="35" aria-label="Years"><em data-i18n="calc.years">years</em></label>
+            <label class="input-wrap"><input id="cMonths" type="text" inputmode="numeric" autocomplete="off" value="" placeholder="0" aria-label="Months"><em data-i18n="calc.months">months</em></label>
+          </div>
+        </div>
+        <label class="field">
+          <span><span data-i18n="calc.extra">Extra payment per month</span> <small data-i18n="calc.optional">(optional)</small></span>
+          <span class="input-wrap"><em>RM</em><input id="cExtra" type="text" inputmode="decimal" autocomplete="off" value="" placeholder="0"></span>
+        </label>
+        <p class="calc-error" id="calcError" role="alert" hidden data-i18n="calc.error">Please enter a loan amount, an interest rate and a loan term.</p>
+        <button type="button" class="btn-link" id="calcReset" data-i18n="calc.reset">Reset</button>
+      </form>
+
+      <div class="calc-result" aria-live="polite">
+        <p class="res-label" data-i18n="calc.monthly">Monthly instalment</p>
+        <p class="res-big">RM <span id="rMonthly">–</span></p>
+        <p class="res-extra" id="rExtraNote" hidden><span data-i18n="calc.withextra">With extra payment:</span> RM <span id="rMonthlyExtra"></span></p>
+        <dl class="res-list">
+          <div><dt data-i18n="calc.total">Total payment</dt><dd>RM <span id="rTotal">–</span></dd></div>
+          <div><dt data-i18n="calc.interest">Total interest</dt><dd>RM <span id="rInterest">–</span></dd></div>
+          <div><dt data-i18n="calc.annual">Annual payment</dt><dd>RM <span id="rAnnual">–</span></dd></div>
+          <div><dt data-i18n="calc.constant">Mortgage constant</dt><dd><span id="rConstant">–</span>%</dd></div>
+          <div class="res-saving" id="rSavingRow" hidden><dt data-i18n="calc.payoff">Paid off in</dt><dd id="rPayoff"></dd></div>
+          <div class="res-saving" id="rSavedRow" hidden><dt data-i18n="calc.saved">Interest saved</dt><dd>RM <span id="rSaved"></span></dd></div>
+        </dl>
+        <div class="res-actions">
+          <a class="btn btn-gold" id="calcWa" href="#contact" data-i18n="calc.discuss">Discuss with an advisor</a>
+          <button type="button" class="btn btn-ghost-light" id="calcPrint" data-i18n="calc.print">Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="amort">
+      <div class="amort-head">
+        <h3 data-i18n="calc.schedule">Amortisation schedule</h3>
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" class="is-active" data-view="month" data-i18n="calc.monthlyview">Monthly</button>
+          <button type="button" data-view="year" data-i18n="calc.yearlyview">Yearly</button>
+        </div>
+      </div>
+      <div class="amort-scroll" id="amortScroll" tabindex="0">
+        <table class="amort-table">
+          <thead><tr>
+            <th id="thNo" data-i18n="calc.no">No</th>
+            <th data-i18n="calc.payment">Payment</th>
+            <th data-i18n="calc.th.interest">Interest</th>
+            <th data-i18n="calc.principal">Principal</th>
+            <th data-i18n="calc.balance">Balance</th>
+          </tr></thead>
+          <tbody id="amortBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="calc-note" data-i18n="calc.note">This calculator gives an estimate only, based on a fixed rate for the whole term. Actual instalments depend on the bank's package, rate changes and fees. Talk to us for figures based on your situation.</p>
+  </div>
+</section>
+
 <!-- AGENTS -->
 <section class="section section-navy" id="agents">
   <div class="wrap split">
@@ -233,6 +308,7 @@
     <nav class="foot-nav" aria-label="Footer">
       <a href="#services" data-i18n="nav.services">Services</a>
       <a href="#process" data-i18n="nav.process">How it works</a>
+      <a href="#calculator" data-i18n="nav.calc">Loan Calculator</a>
       <a href="#agents" data-i18n="nav.agents">For Property Agents</a>
       <a href="#careers" data-i18n="nav.careers">Careers</a>
       <a href="#faq" data-i18n="nav.faq">FAQ</a>

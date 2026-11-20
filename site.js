@@ -39,6 +39,39 @@ var MS = {
   "ch3.t": "Saya ingin menyertai pasukan",
   "ch3.d": "Jadi seorang Mortgage Specialist",
 
+  "nav.calc": "Kalkulator Pinjaman",
+  "calc.eyebrow": "Kalkulator pinjaman",
+  "calc.title": "Anggarkan ansuran bulanan anda",
+  "calc.amount": "Jumlah pinjaman",
+  "calc.rate": "Kadar faedah",
+  "calc.peryear": "% setahun",
+  "calc.term": "Tempoh pinjaman",
+  "calc.years": "tahun",
+  "calc.months": "bulan",
+  "calc.extra": "Bayaran tambahan sebulan",
+  "calc.optional": "(pilihan)",
+  "calc.error": "Sila masukkan jumlah pinjaman, kadar faedah dan tempoh pinjaman.",
+  "calc.reset": "Set semula",
+  "calc.monthly": "Ansuran bulanan",
+  "calc.withextra": "Dengan bayaran tambahan:",
+  "calc.total": "Jumlah bayaran",
+  "calc.interest": "Jumlah faedah",
+  "calc.annual": "Bayaran tahunan",
+  "calc.constant": "Pemalar gadai janji",
+  "calc.payoff": "Selesai dalam",
+  "calc.saved": "Penjimatan faedah",
+  "calc.discuss": "Bincang dengan penasihat",
+  "calc.print": "Cetak / Simpan PDF",
+  "calc.schedule": "Jadual pelunasan",
+  "calc.monthlyview": "Bulanan",
+  "calc.yearlyview": "Tahunan",
+  "calc.no": "No",
+  "calc.payment": "Bayaran",
+  "calc.th.interest": "Faedah",
+  "calc.principal": "Prinsipal",
+  "calc.balance": "Baki",
+  "calc.note": "Kalkulator ini memberi anggaran sahaja, berdasarkan kadar tetap sepanjang tempoh. Ansuran sebenar bergantung pada pakej bank, perubahan kadar dan caj. Hubungi kami untuk angka berdasarkan keadaan anda.",
+
   "hero.eyebrow": "Khidmat nasihat pembiayaan rumah · Malaysia",
   "hero.title": "Bank yang tepat.<br>Pinjaman yang tepat.<br><span class=\"gold\">Sesuai untuk anda.</span>",
   "hero.lead": "Kami membantu pembeli dan pemilik hartanah di Malaysia memilih pembiayaan rumah yang tepat. Kami membandingkan pakej daripada pelbagai bank, menerangkan terma dalam bahasa yang mudah, dan membimbing anda dari permohonan hingga kelulusan, supaya anda meminjam dengan yakin.",
@@ -160,6 +193,7 @@ var MS = {
     });
     setWaLinks();
     try { localStorage.setItem("bma-lang", lang); } catch (e) {}
+    document.dispatchEvent(new CustomEvent("bma:lang", { detail: lang }));
   }
 
   document.querySelectorAll(".lang button").forEach(function (b) {
@@ -178,4 +212,149 @@ var MS = {
 
   document.getElementById("year").textContent = new Date().getFullYear();
   apply(lang);
+})();
+
+/* ============================================================
+   Loan calculator + amortisation schedule
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("calcForm");
+  if (!form) return;
+  var DEFAULTS = { cAmount: "500,000", cRate: "3.9", cYears: "35", cMonths: "", cExtra: "" };
+  var view = "month";
+  var last = null;
+
+  function lang() { return document.documentElement.lang === "ms" ? "ms" : "en"; }
+  function num(v) { var n = parseFloat(String(v).replace(/[^0-9.]/g, "")); return isFinite(n) ? n : 0; }
+  function r2(x) { return Math.round(x * 100) / 100; }
+  function fmt(x) { return x.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function fmtAmount(input) {
+    var raw = input.value.replace(/[^0-9.]/g, "");
+    if (!raw) { input.value = ""; return; }
+    var parts = raw.split(".");
+    var whole = parts[0].replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    input.value = parts.length > 1 ? whole + "." + parts.slice(1).join("").slice(0, 2) : whole;
+  }
+
+  // Monthly instalment is rounded to the sen; each row's interest is rounded,
+  // and the last instalment absorbs the rounding so the balance ends at zero.
+  function schedule(P, ratePct, n, extra) {
+    var r = ratePct / 1200;
+    var pmt = r2(r === 0 ? P / n : P * r / (1 - Math.pow(1 + r, -n)));
+    var b = P, rows = [], ti = 0, tp = 0;
+    for (var i = 1; i <= n && b > 0.004; i++) {
+      var interest = r2(b * r);
+      var pay = pmt + extra;
+      var prin = r2(pay - interest);
+      if (prin >= b || i === n) { prin = b; pay = r2(prin + interest); }
+      b = r2(b - prin);
+      ti += interest; tp += pay;
+      rows.push([i, pay, interest, prin, b]);
+    }
+    return { pmt: pmt, rows: rows, interest: r2(ti), total: r2(tp) };
+  }
+
+  function duration(m) {
+    var y = Math.floor(m / 12), mo = m % 12, ms = lang() === "ms";
+    var out = [];
+    if (y) out.push(y + (ms ? " tahun" : (y === 1 ? " year" : " years")));
+    if (mo) out.push(mo + (ms ? " bulan" : (mo === 1 ? " month" : " months")));
+    return out.join(" ");
+  }
+
+  function calc() {
+    var P = num($("cAmount").value), rate = num($("cRate").value);
+    var n = Math.round(num($("cYears").value) * 12 + num($("cMonths").value));
+    var extra = num($("cExtra").value);
+    var ok = P > 0 && $("cRate").value.trim() !== "" && rate <= 30 && n > 0 && n <= 600;
+    $("calcError").hidden = ok;
+    if (!ok) { last = null; render(); return; }
+    var base = schedule(P, rate, n, 0);
+    var res = extra > 0 ? schedule(P, rate, n, extra) : base;
+    last = { P: P, rate: rate, n: n, extra: extra, base: base, res: res };
+    render();
+  }
+
+  function setText(id, t) { $(id).textContent = t; }
+
+  function render() {
+    if (!last) {
+      ["rMonthly", "rTotal", "rInterest", "rAnnual", "rConstant"].forEach(function (id) { setText(id, "–"); });
+      $("rExtraNote").hidden = $("rSavingRow").hidden = $("rSavedRow").hidden = true;
+      $("amortBody").innerHTML = "";
+      return;
+    }
+    var L = last, monthlyPay = L.base.pmt + L.extra;
+    setText("rMonthly", fmt(L.base.pmt));
+    setText("rTotal", fmt(L.res.total));
+    setText("rInterest", fmt(L.res.interest));
+    setText("rAnnual", fmt(r2(monthlyPay * 12)));
+    setText("rConstant", (monthlyPay * 12 / L.P * 100).toFixed(2));
+    var hasExtra = L.extra > 0;
+    $("rExtraNote").hidden = $("rSavingRow").hidden = $("rSavedRow").hidden = !hasExtra;
+    if (hasExtra) {
+      setText("rMonthlyExtra", fmt(r2(monthlyPay)));
+      setText("rPayoff", duration(L.res.rows.length));
+      setText("rSaved", fmt(r2(L.base.interest - L.res.interest)));
+    }
+    renderTable();
+    updateWa();
+  }
+
+  function renderTable() {
+    var rows = last ? last.res.rows : [], html = [];
+    var ms = lang() === "ms";
+    $("thNo").textContent = view === "year" ? (ms ? "Tahun" : "Year") : "No";
+    if (view === "month") {
+      rows.forEach(function (r) {
+        html.push("<tr><td>" + r[0] + "</td><td>" + fmt(r[1]) + "</td><td>" + fmt(r[2]) + "</td><td>" + fmt(r[3]) + "</td><td>" + fmt(r[4]) + "</td></tr>");
+      });
+    } else {
+      for (var i = 0; i < rows.length; i += 12) {
+        var chunk = rows.slice(i, i + 12), pay = 0, intr = 0, prin = 0;
+        chunk.forEach(function (r) { pay += r[1]; intr += r[2]; prin += r[3]; });
+        html.push("<tr><td>" + (i / 12 + 1) + "</td><td>" + fmt(r2(pay)) + "</td><td>" + fmt(r2(intr)) + "</td><td>" + fmt(r2(prin)) + "</td><td>" + fmt(chunk[chunk.length - 1][4]) + "</td></tr>");
+      }
+    }
+    $("amortBody").innerHTML = html.join("");
+  }
+
+  function updateWa() {
+    var a = $("calcWa");
+    if (!last || typeof WHATSAPP_NUMBER === "undefined" || !WHATSAPP_NUMBER) return;
+    var L = last, ms = lang() === "ms";
+    var term = duration(L.n);
+    var msg = ms
+      ? "Hai Bespoke Mortgage Advisory, saya telah guna kalkulator pinjaman anda: pinjaman RM" + fmt(L.P) + ", kadar " + L.rate + "% untuk " + term + ", ansuran bulanan RM" + fmt(L.base.pmt) + ". Saya ingin mendapatkan nasihat."
+      : "Hi Bespoke Mortgage Advisory, I used your loan calculator: loan RM" + fmt(L.P) + " at " + L.rate + "% for " + term + ", monthly instalment RM" + fmt(L.base.pmt) + ". I would like some advice.";
+    a.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+    a.target = "_blank"; a.rel = "noopener";
+  }
+
+  form.addEventListener("input", function (e) {
+    if (e.target.id === "cAmount" || e.target.id === "cExtra") fmtAmount(e.target);
+    calc();
+  });
+  form.addEventListener("submit", function (e) { e.preventDefault(); calc(); });
+  $("calcReset").addEventListener("click", function () {
+    Object.keys(DEFAULTS).forEach(function (id) { $(id).value = DEFAULTS[id]; });
+    calc();
+  });
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      view = b.getAttribute("data-view");
+      document.querySelectorAll(".seg button").forEach(function (x) { x.classList.toggle("is-active", x === b); });
+      renderTable();
+      $("amortScroll").scrollTop = 0;
+    });
+  });
+  $("calcPrint").addEventListener("click", function () {
+    document.documentElement.classList.add("print-calc");
+    window.print();
+  });
+  window.addEventListener("afterprint", function () { document.documentElement.classList.remove("print-calc"); });
+  document.addEventListener("bma:lang", function () { if (last) render(); else renderTable(); });
+
+  calc();
 })();

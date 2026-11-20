@@ -41,7 +41,7 @@ p { margin: 0; }
 .btn-gold:hover { background: #a47c37; }
 .btn-navy { background: var(--navy); color: #fff; }
 .btn-navy:hover { background: var(--navy-2); }
-.btn-ghost-light { border-color: rgba(255,255,255,.4); color: #fff; }
+.btn-ghost-light { border-color: rgba(255,255,255,.4); color: #fff; background: transparent; }
 .btn-ghost-light:hover { border-color: #fff; background: rgba(255,255,255,.08); }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .btn-row.center { justify-content: center; }
@@ -248,4 +248,84 @@ address { font-style: normal; }
 .foot-contact { font-size: .92rem; opacity: .8; display: grid; gap: 10px; margin-top: 18px; }
 @media (max-width: 560px) {
   .contact-info { grid-template-columns: 1fr; gap: 24px; margin-top: 36px; padding-top: 28px; }
+}
+
+/* Loan calculator */
+.calc { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 20px 50px rgba(18,26,51,.08); }
+.calc-form { padding: 36px; display: grid; gap: 22px; align-content: start; }
+.field { display: grid; gap: 8px; font-weight: 600; font-size: .95rem; color: var(--navy); }
+.field small { font-weight: 400; color: var(--muted); }
+.field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.input-wrap { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 16px; background: var(--paper); transition: border-color .15s, box-shadow .15s; }
+.input-wrap:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(185,143,69,.15); }
+.input-wrap em { font-style: normal; color: var(--muted); font-weight: 500; font-size: .92rem; white-space: nowrap; }
+.input-wrap input { flex: 1; min-width: 0; width: 100%; border: 0; background: none; padding: 14px 0; font: 600 1.15rem var(--sans); color: var(--ink); outline: none; font-variant-numeric: tabular-nums; }
+.calc-error { color: #b3261e; font-size: .92rem; font-weight: 500; }
+.btn-link { justify-self: start; background: none; border: 0; padding: 0; font: 600 .92rem var(--sans); color: var(--gold); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.calc-result { background: var(--navy); color: #fff; padding: 36px; display: flex; flex-direction: column; }
+.res-label { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-soft); font-weight: 600; }
+.res-big { font-family: var(--serif); font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.1; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
+.res-extra { opacity: .8; font-size: .95rem; }
+.res-list { margin: 24px 0 28px; display: grid; }
+.res-list > div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+.res-list > div[hidden] { display: none; }
+.res-list dt { opacity: .75; }
+.res-list dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.res-saving dd { color: var(--gold-soft); }
+.res-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 12px; }
+.res-actions .btn { flex: 1 1 200px; font-family: var(--sans); }
+
+.amort { margin-top: 36px; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: #fff; }
+.amort-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--sand); border-radius: 999px; padding: 4px; }
+.seg button { border: 0; background: none; padding: 8px 18px; border-radius: 999px; font: 600 .88rem var(--sans); color: var(--muted); cursor: pointer; }
+.seg button.is-active { background: var(--navy); color: #fff; }
+.amort-scroll { max-height: 520px; overflow: auto; -webkit-overflow-scrolling: touch; }
+.amort-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .95rem; }
+.amort-table th { position: sticky; top: 0; background: #f8f1df; color: var(--navy); font-weight: 600; text-align: right; padding: 12px 20px; white-space: nowrap; }
+.amort-table td { text-align: right; padding: 11px 20px; border-bottom: 1px solid #efe9dd; white-space: nowrap; }
+.amort-table th:first-child, .amort-table td:first-child { text-align: left; color: var(--muted); }
+.amort-table th:first-child { color: var(--navy); }
+.amort-table tbody tr:hover { background: #fbf8f1; }
+.calc-note { margin-top: 18px; font-size: .86rem; color: var(--muted); max-width: 80ch; }
+
+@media (max-width: 920px) {
+  .calc { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .calc-form, .calc-result { padding: 24px 20px; }
+  .calc, .amort { border-radius: 18px; }
+  .amort-head { padding: 16px; }
+  .amort-table { font-size: .78rem; }
+  .amort-table th, .amort-table td { padding: 10px 6px; }
+  .amort-table th:first-child, .amort-table td:first-child { padding-left: 12px; }
+  .amort-table th:last-child, .amort-table td:last-child { padding-right: 12px; }
+  .amort-scroll { max-height: 440px; }
+}
+@media (max-width: 1240px) and (min-width: 921px) {
+  .header-cta { display: none; }
+  .nav { gap: 20px; }
+}
+
+/* Print only the calculator when "Print / Save PDF" is used */
+@media print {
+  html.print-calc body > *:not(main), html.print-calc main > section:not(#calculator) { display: none !important; }
+  html.print-calc #calculator { padding: 0; }
+  html.print-calc .amort-scroll { max-height: none; overflow: visible; }
+  html.print-calc .res-actions, html.print-calc .btn-link, html.print-calc .seg { display: none; }
+  html.print-calc .calc, html.print-calc .amort { box-shadow: none; overflow: visible; }
+  html.print-calc .calc-result, html.print-calc .amort-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html.print-calc .amort-table th { position: static; }
+  html.print-calc .amort-table tr { break-inside: avoid; }
+}
+
+/* Use the menu button on mid-size screens too, so the longer BM menu never overflows */
+@media (max-width: 1180px) {
+  .menu-btn { display: flex; }
+  .header-actions { margin-left: auto; }
+  .header-cta { display: none; }
+  .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--paper); border-bottom: 1px solid var(--line); flex-direction: column; gap: 0; padding: 8px 24px 16px; margin: 0; }
+  .nav.is-open { display: flex; }
+  .nav a { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
+  .nav a:last-child { border-bottom: 0; }
 }
