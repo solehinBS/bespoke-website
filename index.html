@@ -219,7 +219,28 @@
           <tbody id="amortBody"></tbody>
         </table>
       </div>
+      <div class="gate" id="gate" hidden>
+        <div class="gate-card">
+          <h3 data-i18n="gate.title">See the full schedule</h3>
+          <p class="gate-lead" data-i18n="gate.lead">Enter your email to unlock the full amortisation table, Print / Save PDF and advisor follow-up. New or returning, it's the same step.</p>
+          <form id="gateEmailForm" class="gate-form" novalidate>
+            <label class="sr-only" for="gateEmail">Email</label>
+            <input id="gateEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+            <button type="submit" class="btn btn-navy" id="gateSend" data-i18n="gate.send">Send code</button>
+          </form>
+          <form id="gateCodeForm" class="gate-form" novalidate hidden>
+            <p class="gate-sent"><span data-i18n="gate.sent">We sent a code to</span> <strong id="gateSentTo"></strong></p>
+            <label class="sr-only" for="gateCode">Code</label>
+            <input id="gateCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="••••••" required>
+            <button type="submit" class="btn btn-navy" id="gateVerify" data-i18n="gate.verify">Verify</button>
+            <button type="button" class="btn-link" id="gateBack" data-i18n="gate.change">Use a different email</button>
+          </form>
+          <p class="gate-msg" id="gateMsg" role="alert"></p>
+          <p class="gate-legal" data-i18n="gate.legal">By continuing, you agree that Bespoke Mortgage Advisory may keep your email and contact you about home financing. We do not share it with anyone else.</p>
+        </div>
+      </div>
     </div>
+    <p class="gate-user" id="gateUser" hidden><span data-i18n="gate.signedin">Signed in as</span> <strong id="gateUserEmail"></strong> · <button type="button" class="btn-link" id="gateSignOut" data-i18n="gate.signout">Sign out</button></p>
     <p class="calc-note" data-i18n="calc.note">This calculator gives an estimate only, based on a fixed rate for the whole term. Actual instalments depend on the bank's package, rate changes and fees. Talk to us for figures based on your situation.</p>
   </div>
 </section>

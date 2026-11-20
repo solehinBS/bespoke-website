@@ -329,3 +329,34 @@ address { font-style: normal; }
   .nav a { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
   .nav a:last-child { border-bottom: 0; }
 }
+
+/* Email sign-in for the full schedule */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.amort.is-locked .amort-scroll { max-height: none; overflow: hidden; position: relative; }
+.amort.is-locked .amort-scroll::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 130px; background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%); pointer-events: none; }
+.gate { padding: 8px 24px 36px; }
+.gate-card { max-width: 540px; margin: 0 auto; text-align: center; }
+.gate-card h3 { font-size: 1.5rem; margin-bottom: 8px; }
+.gate-lead { color: var(--muted); margin-bottom: 20px; }
+.gate-form { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.gate-form[hidden] { display: none; }
+.gate-form input { flex: 1 1 240px; min-width: 0; border: 1.5px solid var(--line); border-radius: 999px; padding: 14px 20px; font: 500 1rem var(--sans); color: var(--ink); background: var(--paper); outline: none; }
+.gate-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(185,143,69,.15); }
+#gateCode { letter-spacing: .3em; text-align: center; font-weight: 600; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.gate-form .btn { flex: 0 0 auto; font-family: var(--sans); }
+.gate-sent { flex-basis: 100%; color: var(--muted); font-size: .95rem; overflow-wrap: anywhere; }
+.gate-sent strong { color: var(--navy); }
+.gate-form .btn-link { flex-basis: 100%; justify-self: center; }
+.btn.is-busy, .btn:disabled { opacity: .6; cursor: progress; transform: none; }
+.gate-msg { color: #b3261e; font-size: .92rem; font-weight: 500; margin-top: 12px; min-height: 1em; }
+.gate-msg:empty { display: none; }
+.gate-legal { color: var(--muted); font-size: .8rem; margin-top: 16px; }
+.gate-user { margin-top: 14px; font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
+.gate-user strong { color: var(--navy); }
+.gate-user .btn-link { font-size: .9rem; }
+@media (max-width: 560px) {
+  .gate { padding: 4px 16px 28px; }
+  .gate-card h3 { font-size: 1.3rem; }
+  .gate-form .btn { flex: 1 1 100%; }
+}
+@media print { .gate, .gate-user { display: none !important; } }

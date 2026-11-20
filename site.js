@@ -4,6 +4,13 @@
 // WhatsApp number in international format, digits only (e.g. "60123456789").
 var WHATSAPP_NUMBER = "60102107256";
 
+// Email sign-in for the loan calculator's full schedule (Supabase project for the website).
+// Paste the Project URL and the anon / publishable key from Supabase > Project Settings > API.
+// While either is empty, the calculator stays fully open (no sign-in).
+var SUPABASE_URL = "";
+var SUPABASE_ANON_KEY = "";
+var SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+
 // Pre-filled WhatsApp messages for each button type.
 var WA_MESSAGES = {
   en: {
@@ -71,6 +78,16 @@ var MS = {
   "calc.principal": "Prinsipal",
   "calc.balance": "Baki",
   "calc.note": "Kalkulator ini memberi anggaran sahaja, berdasarkan kadar tetap sepanjang tempoh. Ansuran sebenar bergantung pada pakej bank, perubahan kadar dan caj. Hubungi kami untuk angka berdasarkan keadaan anda.",
+
+  "gate.title": "Lihat jadual penuh",
+  "gate.lead": "Masukkan e-mel anda untuk membuka jadual pelunasan penuh, Cetak / Simpan PDF dan susulan penasihat. Pengguna baharu atau sedia ada, langkahnya sama.",
+  "gate.send": "Hantar kod",
+  "gate.sent": "Kami telah menghantar kod ke",
+  "gate.verify": "Sahkan",
+  "gate.change": "Guna e-mel lain",
+  "gate.legal": "Dengan meneruskan, anda bersetuju bahawa Bespoke Mortgage Advisory boleh menyimpan e-mel anda dan menghubungi anda tentang pembiayaan rumah. Kami tidak berkongsinya dengan pihak lain.",
+  "gate.signedin": "Log masuk sebagai",
+  "gate.signout": "Log keluar",
 
   "hero.eyebrow": "Khidmat nasihat pembiayaan rumah · Malaysia",
   "hero.title": "Bank yang tepat.<br>Pinjaman yang tepat.<br><span class=\"gold\">Sesuai untuk anda.</span>",
@@ -224,6 +241,8 @@ var MS = {
   var DEFAULTS = { cAmount: "500,000", cRate: "3.9", cYears: "35", cMonths: "", cExtra: "" };
   var view = "month";
   var last = null;
+  var locked = false;
+  var PREVIEW_ROWS = 5;
 
   function lang() { return document.documentElement.lang === "ms" ? "ms" : "en"; }
   function num(v) { var n = parseFloat(String(v).replace(/[^0-9.]/g, "")); return isFinite(n) ? n : 0; }
@@ -305,6 +324,7 @@ var MS = {
   function renderTable() {
     var rows = last ? last.res.rows : [], html = [];
     var ms = lang() === "ms";
+    if (locked) rows = rows.slice(0, view === "year" ? PREVIEW_ROWS * 12 : PREVIEW_ROWS);
     $("thNo").textContent = view === "year" ? (ms ? "Tahun" : "Year") : "No";
     if (view === "month") {
       rows.forEach(function (r) {
@@ -322,6 +342,7 @@ var MS = {
 
   function updateWa() {
     var a = $("calcWa");
+    if (locked) { a.href = "#gate"; a.removeAttribute("target"); return; }
     if (!last || typeof WHATSAPP_NUMBER === "undefined" || !WHATSAPP_NUMBER) return;
     var L = last, ms = lang() === "ms";
     var term = duration(L.n);
@@ -349,12 +370,148 @@ var MS = {
       $("amortScroll").scrollTop = 0;
     });
   });
-  $("calcPrint").addEventListener("click", function () {
+  function toGate(e) {
+    if (!locked) return false;
+    if (e) e.preventDefault();
+    var g = $("gate");
+    g.scrollIntoView({ behavior: "smooth", block: "center" });
+    var input = $("gateCodeForm").hidden ? $("gateEmail") : $("gateCode");
+    setTimeout(function () { input.focus({ preventScroll: true }); }, 400);
+    return true;
+  }
+  $("calcWa").addEventListener("click", toGate);
+  $("calcPrint").addEventListener("click", function (e) {
+    if (toGate(e)) return;
     document.documentElement.classList.add("print-calc");
     window.print();
   });
   window.addEventListener("afterprint", function () { document.documentElement.classList.remove("print-calc"); });
   document.addEventListener("bma:lang", function () { if (last) render(); else renderTable(); });
 
+  // Called by the email sign-in below.
+  window.bmaSetLocked = function (v) {
+    locked = !!v;
+    document.querySelector(".amort").classList.toggle("is-locked", locked);
+    $("gate").hidden = !locked;
+    renderTable();
+    updateWa();
+  };
+
   calc();
+})();
+
+/* ============================================================
+   Email sign-in for the full amortisation schedule
+   (Supabase email code: same step for new and returning visitors)
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  if (!$("gate") || !window.bmaSetLocked) return;
+
+  // Not set up yet: keep the calculator fully open.
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { window.bmaSetLocked(false); return; }
+
+  var MSG = {
+    en: {
+      email: "Please enter a valid email address.",
+      shortcode: "Please enter the code from the email.",
+      badcode: "That code is wrong or has expired. Check the email, or use a different email to get a new code.",
+      rate: "Too many attempts. Please wait a minute and try again.",
+      generic: "Something went wrong. Please try again."
+    },
+    ms: {
+      email: "Sila masukkan alamat e-mel yang sah.",
+      shortcode: "Sila masukkan kod daripada e-mel.",
+      badcode: "Kod itu salah atau telah tamat tempoh. Semak e-mel anda, atau guna e-mel lain untuk mendapatkan kod baharu.",
+      rate: "Terlalu banyak cubaan. Sila tunggu seminit dan cuba lagi.",
+      generic: "Ada masalah. Sila cuba lagi."
+    }
+  };
+
+  var client = null, email = "", msgKey = "";
+  window.bmaSetLocked(true);
+
+  function lang() { return document.documentElement.lang === "ms" ? "ms" : "en"; }
+  function msg(key) { msgKey = key || ""; $("gateMsg").textContent = msgKey ? MSG[lang()][msgKey] : ""; }
+  function busy(btn, on) { btn.disabled = on; btn.classList.toggle("is-busy", on); }
+  function errKey(err) {
+    var st = err && err.status, m = String(err && err.message || "").toLowerCase();
+    if (st === 429 || m.indexOf("rate") >= 0 || m.indexOf("security purposes") >= 0) return "rate";
+    if (m.indexOf("expired") >= 0 || m.indexOf("invalid") >= 0 || m.indexOf("token") >= 0 || m.indexOf("otp") >= 0) return "badcode";
+    return "generic";
+  }
+
+  function stepEmail() {
+    $("gateEmailForm").hidden = false; $("gateCodeForm").hidden = true;
+    $("gateCode").value = ""; msg("");
+  }
+  function stepCode() {
+    $("gateSentTo").textContent = email;
+    $("gateEmailForm").hidden = true; $("gateCodeForm").hidden = false;
+    msg(""); $("gateCode").focus();
+  }
+  function signedIn(user) {
+    $("gateUserEmail").textContent = user.email || "";
+    $("gateUser").hidden = false;
+    window.bmaSetLocked(false);
+  }
+  function signedOut() {
+    $("gateUser").hidden = true;
+    window.bmaSetLocked(true);
+    stepEmail();
+  }
+
+  $("gateEmailForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!client) return;
+    email = $("gateEmail").value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg("email"); return; }
+    busy($("gateSend"), true); msg("");
+    client.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } }).then(function (r) {
+      busy($("gateSend"), false);
+      if (r.error) msg(errKey(r.error)); else stepCode();
+    });
+  });
+
+  $("gateCodeForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!client) return;
+    var code = $("gateCode").value.replace(/\D/g, "");
+    if (code.length < 6) { msg("shortcode"); return; }
+    busy($("gateVerify"), true); msg("");
+    client.auth.verifyOtp({ email: email, token: code, type: "email" }).then(function (r) {
+      busy($("gateVerify"), false);
+      if (r.error) { msg(errKey(r.error)); return; }
+      if (r.data && r.data.user) signedIn(r.data.user);
+    });
+  });
+
+  $("gateBack").addEventListener("click", function () { stepEmail(); $("gateEmail").focus(); });
+  $("gateSignOut").addEventListener("click", function () {
+    if (client) client.auth.signOut().then(signedOut); else signedOut();
+  });
+  document.addEventListener("bma:lang", function () { msg(msgKey); });
+
+  function init() {
+    if (!window.supabase || !window.supabase.createClient) { window.bmaSetLocked(false); return; }
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
+    client.auth.getSession().then(function (r) {
+      var u = r.data && r.data.session && r.data.session.user;
+      if (u) signedIn(u); else signedOut();
+    });
+    client.auth.onAuthStateChange(function (ev, session) {
+      if (session && session.user) signedIn(session.user);
+      else if (ev === "SIGNED_OUT") signedOut();
+    });
+  }
+
+  // Load the Supabase library only when sign-in is set up.
+  // If it cannot load (blocked network), leave the calculator open rather than trap visitors.
+  var tag = document.createElement("script");
+  tag.src = SUPABASE_JS;
+  tag.onload = init;
+  tag.onerror = function () { window.bmaSetLocked(false); };
+  document.head.appendChild(tag);
 })();
