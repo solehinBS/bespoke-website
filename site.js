@@ -461,6 +461,12 @@ var MS = {
     return "generic";
   }
 
+  // Supabase unreachable (paused, outage, blocked network): status 0 / missing or a 5xx.
+  function serviceDown(status) { return !status || status >= 500; }
+  // Never trap visitors behind a broken sign-in: open the table without remembering anything,
+  // so the next visit tries the normal sign-in again.
+  function openAnyway() { msg(""); $("gateUser").hidden = true; window.bmaSetLocked(false); }
+
   function stepEmail() {
     $("gateEmailForm").hidden = false; $("gateCodeForm").hidden = true;
     $("gateCode").value = ""; msg("");
@@ -492,8 +498,10 @@ var MS = {
     // Registered (verified before)? Open straight away. Otherwise email a one-time code.
     client.rpc("calc_returning_signin", { p_email: email }).then(function (r) {
       if (!r.error && r.data === true) { busy($("gateSend"), false); signedIn(email); return; }
+      if (r.error && serviceDown(r.status)) { busy($("gateSend"), false); openAnyway(); return; }
       client.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } }).then(function (r2) {
         busy($("gateSend"), false);
+        if (r2.error && serviceDown(r2.error.status)) { openAnyway(); return; }
         if (r2.error) msg(errKey(r2.error)); else stepCode();
       });
     });
